@@ -1,37 +1,45 @@
 <script lang="ts">
+	import { run, preventDefault } from 'svelte/legacy';
+
 	import type { RelayTarget } from '@prisma/client';
 	import { createEventDispatcher, onMount } from 'svelte';
 	import { fade, fly } from 'svelte/transition';
 
-	export let target: RelayTarget | null = null;
+	interface Props {
+		target?: RelayTarget | null;
+	}
+
+	let { target = null }: Props = $props();
 
 	const dispatch = createEventDispatcher();
 
-	let dialog: HTMLDialogElement;
-	let nickname = '';
-	let url = '';
-	let method = 'POST';
-	let headers = '';
-	let isActive = true;
+	let dialog: HTMLDialogElement | undefined = $state();
+	let nickname = $state('');
+	let url = $state('');
+	let method = $state('POST');
+	let headers = $state('');
+	let isActive = $state(true);
 
-	$: isEditMode = !!target;
+	let isEditMode = $derived(!!target);
 
-	$: if (target) {
-		nickname = target.name;
-		url = target.url;
-		method = 'Post';
-		headers = `{"Content-Type": "application/json"}`;
-		isActive = true;
-	}
+	run(() => {
+		if (target) {
+			nickname = target.name;
+			url = target.url;
+			method = 'Post';
+			headers = `{"Content-Type": "application/json"}`;
+			isActive = true;
+		}
+	});
 
 	onMount(() => {
-		dialog.addEventListener('close', () => {
+		dialog?.addEventListener('close', () => {
 			resetForm();
 		});
 	});
 
 	function openModal() {
-		dialog.showModal();
+		dialog?.showModal();
 	}
 
 	function handleSubmit() {
@@ -57,7 +65,7 @@
 	}
 
 	function closeModal() {
-		dialog.close();
+		dialog?.close();
 	}
 
 	function resetForm() {
@@ -71,7 +79,7 @@
 	}
 </script>
 
-<button on:click={openModal} class="btn variant-outline btn-sm">
+<button onclick={openModal} class="btn variant-outline btn-sm">
 	{isEditMode ? 'Update' : 'Add'}
 </button>
 
@@ -81,7 +89,7 @@
 			<h2 class="text-2xl font-bold mb-4">
 				{isEditMode ? 'Update' : 'Create'} Webhook Relay Target
 			</h2>
-			<form on:submit|preventDefault={handleSubmit} class="space-y-4">
+			<form onsubmit={preventDefault(handleSubmit)} class="space-y-4">
 				<div>
 					<label for="nickname" class="label">Nickname</label>
 					<input class="input" type="text" id="nickname" bind:value={nickname} required />
@@ -99,13 +107,13 @@
 				<div class="flex justify-end space-x-3">
 					<button
 						type="button"
-						on:click={closeModal}
+						onclick={closeModal}
 						class="px-4 py-2 border rounded-md text-sm font-medium hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
 					>
 						Cancel
 					</button>
 					<button
-						on:click={handleSubmit}
+						onclick={handleSubmit}
 						class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
 					>
 						{isEditMode ? 'Update' : 'Create'}

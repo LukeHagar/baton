@@ -1,34 +1,36 @@
 <script lang="ts">
 	import CodeBlock from '$lib/components/CodeBlock.svelte';
-	import { RadioGroup, RadioItem } from '@skeletonlabs/skeleton';
-	import { PaneGroup, Pane, PaneResizer } from 'paneforge';
 	import type { Webhook } from '@prisma/client';
+	import { RadioGroup, RadioItem } from '@skeletonlabs/skeleton';
+	import { GripHorizontal } from 'lucide-svelte';
+	import { Pane, PaneGroup, PaneResizer } from 'paneforge';
 	import { type Writable } from 'svelte/store';
-	import { GripVertical, GripHorizontal } from 'lucide-svelte';
 
-	export let selectedWebhook: Writable<Webhook | undefined>;
+	interface Props {
+		selectedWebhook: Writable<Webhook | undefined>;
+	}
 
-	let showHeaders = true;
-	let showBody = true;
-	let value: number = 0;
+	let { selectedWebhook }: Props = $props();
 
-	$: console.log(value);
+	let showHeaders = $state(true);
+	let showBody =  $state(true);
+	let value: number = $state(0);
 </script>
 
 {#if $selectedWebhook}
 
 	<div class="flex justify-end gap-2 items-center ">
-		<!-- <RadioGroup>
+		<RadioGroup>
 			<RadioItem bind:group={value} name="justify" value={0}>(label)</RadioItem>
 			<RadioItem bind:group={value} name="justify" value={1}>(label)</RadioItem>
 			<RadioItem bind:group={value} name="justify" value={2}>(label)</RadioItem>
 		</RadioGroup>
-		<button class="btn btn-sm variant-outline" on:click={() => (showHeaders = !showHeaders)}>
+		<button class="btn btn-sm variant-outline" onclick={() => (showHeaders = !showHeaders)}>
 			{(showHeaders ? 'Hide' : 'Show') + ' Headers'}
 		</button>
-		<button class="btn btn-sm variant-outline" on:click={() => (showBody = !showBody)}>
+		<button class="btn btn-sm variant-outline" onclick={() => (showBody = !showBody)}>
 			{(showBody ? 'Hide' : 'Show') + ' Body'}
-		</button> -->
+		</button>
 	</div>
 	<PaneGroup direction="vertical" class="w-full rounded-lg" autoSaveId="inspectPane">
 		{#if showHeaders}

@@ -44,6 +44,14 @@
 	onDestroy(() => {
 		clearInterval(refreshInterval);
 	});
+
+	function setFocusedWebhook(event?: KeyboardEvent, webhook?: Webhook) {
+		if (event && event.key && event.key !== 'Enter') {
+			return;
+		}
+
+		selectedWebhook.set(webhook)
+	} 
 </script>
 
 <div class="flex flex-col h-screen">
@@ -62,17 +70,20 @@
 				<div class="flex-1 overflow-hidden">
 					<div class="h-full overflow-y-auto px-1 space-y-2 custom-scrollbar">
 						{#each $webhooks as webhook (webhook.id)}
-							<button
+							<div
 								class="relative overflow-hidden bg-white bg-opacity-80 backdrop-blur-sm card shadow cursor-pointer hover:shadow-md transition-shadow duration-200 w-full"
 								class:selected={$selectedWebhook?.id == webhook.id}
-								on:click|preventDefault={() => selectedWebhook.set(webhook)}
+								tabindex="0"
+								onkeydown={(event) => setFocusedWebhook(event, webhook)}
+								onclick={() => selectedWebhook.set(webhook)}
+								role="button"
 								transition:fly|local={{ x: -200, duration: 200 }}
 							>
 								{#if $selectedWebhook?.id == webhook.id}
 									<!-- Active border indicator -->
 									<div
 										class="absolute inset-0 border-2 border-blue-500 rounded-container-token pointer-events-none"
-									/>
+									></div>
 								{/if}
 								<div class="p-2 relative">
 									<div class="flex justify-between items-center mb-1">
@@ -97,7 +108,7 @@
 										<span>
 											<button
 												type="submit"
-												on:click|stopPropagation={() => sendWebhook($webhookTarget, webhook.id)}
+												onclick={() => sendWebhook($webhookTarget, webhook.id)}
 												class="btn variant-outline btn-sm"
 												aria-label="Resend webhook"
 											>
@@ -105,7 +116,7 @@
 												Resend
 											</button>
 											<button
-												on:click|stopPropagation={() => deleteWebhook(webhook.id)}
+												onclick={() => deleteWebhook(webhook.id)}
 												type="submit"
 												formaction="?/delete?webhookId={webhook.id}"
 												class="btn variant-outline btn-sm"
@@ -117,7 +128,7 @@
 										</span>
 									</div>
 								</div>
-							</button>
+							</div>
 						{/each}
 					</div>
 				</div>

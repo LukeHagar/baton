@@ -2,8 +2,12 @@
 	import type { Writable } from "svelte/store";
 	import AddUpdateModal from "./AddUpdateModal.svelte";
 
-    export let webhookTarget: Writable<string>
-    export let intervalInSeconds: Writable<number>
+    interface Props {
+        webhookTarget: Writable<string>;
+        intervalInSeconds: Writable<number>;
+    }
+
+    let { webhookTarget, intervalInSeconds }: Props = $props();
 </script>
 
 <div class="card p-2">
